@@ -60,6 +60,8 @@ install_pkgs: checkroot
 
 # Setup --- begin
 createisoskel: checkroot
+	@mkdir -p $(configBuildPath)/logs
+
 	@mkdir -p $(configBuildPath)/iso_root/live
 	@mkdir -p $(configBuildPath)/iso_root/boot/grub
 
