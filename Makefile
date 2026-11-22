@@ -1,9 +1,9 @@
-.PHONY: migrate chroot masclean isoclean install_pkgs setup_rootfs genInitramfs genSquashfs copyBoots
+.PHONY: checkroot reiso migrate chroot masclean isoclean install_pkgs setup_rootfs genInitramfs genSquashfs copyBoots
 
+# 'settings':
 workdir       := $(shell pwd)
-
-# packages thats gets installed on the rootfs
-chroot_pkgs := live-boot \
+iso_name 	  := simpleLinux.iso
+chroot_pkgs   := live-boot \
 	linux-image-6.12.107+deb13-amd64 \
 	lightdm \
 	openbox \
@@ -15,39 +15,49 @@ chroot_pkgs := live-boot \
 	dhcpd \
 	htop
 
-GRUB_MKRESCUE := $(shell command -v grub2-mkrescue 2>/dev/null || echo grub-mkrescue)	
+apt_args         := --no-install-recommends
+debootstrap_args := --variant minbase
+arch             := amd64
 
+GRUB_MKRESCUE := $(shell command -v grub2-mkrescue 2>/dev/null || echo grub-mkrescue)	
 migrate_files := $(wildcard $(workdir)/migrate/*)
 
-iso_name := simpleLinux.iso
+SHELL := /bin/bash
 
 all:
 	@echo "Check the README.md! To get started!"
 
-chroot:
+
+checkroot:
+	@if [[ "$$EUID" -ne 0 ]]; then \
+		echo "For running its you need to run it with sudo"; \
+		exit 1; \
+	fi
+
+chroot: checkroot
 	@chroot $(workdir)/rootfs /bin/bash
 	@umount $(workdir)/rootfs/proc || true
 
-masclean:
+masclean: checkroot
 	@sudo rm -rf rootfs 
 
-isoclean:
+isoclean: checkroot
 	@rm -f $(workdir)/iso_root/boot/{vmlinuz,initrd.img}
 	@rm -f $(workdir)/iso_root/live/*
 	@rm -f $(workdir)/$(iso_name)
 
 # Setup --- begin
 install_pkgs:
-	@chroot $(workdir)/rootfs apt install --no-install-recommends $(chroot_pkgs) -y 2>/dev/null
+	@chroot $(workdir)/rootfs apt install $(apt_args) $(chroot_pkgs) -y 2>/dev/null
 setup_rootfs: 
-	@debootstrap --arch amd64 stable $(workdir)/rootfs http://deb.debian.org/debian/ 2>/dev/null
+	@debootstrap $(debootstrap_args) --arch $(arch) stable $(workdir)/rootfs http://deb.debian.org/debian/ 2>/dev/null
 
-setup: setup_rootfs install_pkgs
+setup: checkroot setup_rootfs install_pkgs migrate
 	@mkdir $(workdir)/iso_root/live/
 	@echo "done: setup"
 # Setup --- end
 
-migrate:
+migrate: checkroot
 	@for file in $(migrate_files); do \
 		echo "Applying: $$file..."; \
 		chmod +x $$file; \
@@ -67,6 +77,10 @@ copyBoots:
 	@cp $(workdir)/rootfs/vmlinuz $(workdir)/iso_root/boot
 	@cp $(workdir)/rootfs/initrd.img $(workdir)/iso_root/boot
 
-iso: genInitramfs genSquashfs copyBoots
+reiso: checkroot
+	@$(GRUB_MKRESCUE) $(workdir)/iso_root -o $(workdir)/$(iso_name)
+	@echo "Your iso is regerated: $(workdir)/$(iso_name)"
+
+iso: checkroot genInitramfs genSquashfs copyBoots
 	@$(GRUB_MKRESCUE) $(workdir)/iso_root -o $(workdir)/$(iso_name)
 	@echo "Your iso is done: $(workdir)/$(iso_name)"
