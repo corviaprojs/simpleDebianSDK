@@ -1,14 +1,5 @@
-echo "copyfons"
 
-mkdir -p /etc/skel/.config
-mkdir -p /etc/skel/.config/openbox
-
-cat << EOF > /etc/skel/.config/openbox/autostart 
-xsetroot -cursor_name left_ptr &
-EOF
-
-chmod +x /etc/skel/.config/openbox/autostart
-
+# write lightdm config
 cat << EOF > /etc/lightdm/lightdm.conf
 #
 # General configuration
