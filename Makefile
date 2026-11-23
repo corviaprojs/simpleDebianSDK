@@ -60,8 +60,6 @@ install_pkgs: checkroot
 
 # Setup --- begin
 createisoskel: checkroot
-	@mkdir -p $(configBuildPath)/logs
-
 	@mkdir -p $(configBuildPath)/iso_root/live
 	@mkdir -p $(configBuildPath)/iso_root/boot/grub
 
@@ -69,7 +67,7 @@ createisoskel: checkroot
 
 setup_rootfs: checkroot
 	@echo "Debian: '$(DEBIAN_VERSION)' being created from: '$(CONFIG)' config"
-	@debootstrap $(DEBOOTSTRAP_ARGS) --arch $(ARCH) $(DEBIAN_VERSION) $(chrootPath) http://deb.debian.org/debian/ > $(configBuildPath)/logs/debootstrap.log
+	@debootstrap $(DEBOOTSTRAP_ARGS) --arch $(ARCH) $(DEBIAN_VERSION) $(chrootPath) http://deb.debian.org/debian/
 
 setup: checkroot createisoskel setup_rootfs install_pkgs migrate
 	@echo "done: setup"
@@ -95,8 +93,10 @@ copyBoots: checkroot
 reiso: checkroot
 	@$(GRUB_MKRESCUE) $(configBuildPath)/iso_root -o $(configBuildPath)/$(ISO_OUTPUT_NAME)
 	@echo "Your iso is regerated: $(configBuildPath)/$(ISO_OUTPUT_NAME)"
+	@echo "Your iso is stored here: $(configBuildPath)"
 
 # original iso generating 
 iso: checkroot genInitramfs genSquashfs copyBoots
 	@$(GRUB_MKRESCUE) $(configBuildPath)/iso_root -o $(configBuildPath)/$(ISO_OUTPUT_NAME)
 	@echo "Your iso is done: $(configBuildPath)/$(ISO_OUTPUT_NAME)"
+	@echo "Your iso is stored here: $(configBuildPath)"
