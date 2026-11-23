@@ -19,7 +19,15 @@ all:
 # check you are running as root/sudo
 checkroot:
 ifndef CONFIG
-	$(error CONFIG is not set! Run: make CONFIG=<name>)
+	$(error 'CONFIG' is not set! Run: make CONFIG=<name>)
+else ifndef ISO_OUTPUT_NAME
+	$(error 'ISO_OUTPUT_NAME' is not set in your configuration, read docs!)
+else ifndef CHROOT_PKGS
+	$(error 'CHROOT_PKGS' is not set in your configuration, read docs!)
+else ifndef DEBIAN_VERSION
+	$(error 'DEBIAN_VERSION' is not set in your configuration, read docs!)
+else ifndef ARCH
+	$(error 'ARCH' is not set in your configuration, read docs!)
 endif
 	@if [[ "$$EUID" -ne 0 ]]; then \
 		echo "For running its you need to run it with sudo"; \
