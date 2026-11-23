@@ -68,9 +68,8 @@ createisoskel: checkroot
 	@cp $(workdir)/configs/$(CONFIG)/grub/grub.cfg $(configBuildPath)/iso_root/boot/grub/grub.cfg
 
 setup_rootfs: checkroot
-	@echo "Debian: '$(DEBIAN_VERSION)' filesystem being created/used from: '$(CONFIG)' config"
+	@echo "Debian: '$(DEBIAN_VERSION)' being created from: '$(CONFIG)' config"
 	@debootstrap $(DEBOOTSTRAP_ARGS) --arch $(ARCH) $(DEBIAN_VERSION) $(chrootPath) http://deb.debian.org/debian/ > $(configBuildPath)/logs/debootstrap.log
-	@head -n 10 $(configBuildPath)/logs/debootstrap.log
 
 setup: checkroot createisoskel setup_rootfs install_pkgs migrate
 	@echo "done: setup"
