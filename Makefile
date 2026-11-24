@@ -1,4 +1,4 @@
-.PHONY: all createisoskel checkroot reiso migrate chroot masclean isoclean install_pkgs setup_rootfs genInitramfs genSquashfs copyBoots
+.PHONY: all createisoskel default_checks reiso migrate chroot masclean isoclean install_pkgs setup_rootfs genInitramfs genSquashfs copyBoots
 
 ifdef CONFIG
 -include configs/$(CONFIG)/config.mk
@@ -17,7 +17,7 @@ all:
 
 
 # check you are running as root/sudo
-checkroot:
+default_checks:
 ifndef CONFIG
 	$(error 'CONFIG' is not set! Run: make CONFIG=<name>)
 else ifndef ISO_OUTPUT_NAME
@@ -36,25 +36,25 @@ endif
 
 
 # chroot into the filesystem
-chroot: checkroot 
-	@chroot $(chrootPath) /bin/bash || true
-	@umount $(chrootPath)/proc || true
+chroot: default_checks 
+	chroot $(chrootPath) /bin/bash || true
+	umount $(chrootPath)/proc || true
 
 
 # clean the iso_root's boot and live folder
-isoclean: checkroot
-	@rm -f $(configBuildPath)/iso_root/boot/{vmlinuz,initrd.img}
-	@rm -f $(configBuildPath)/iso_root/live/*
-	@rm -f $(configBuildPath)/$(ISO_OUTPUT_NAME)
+isoclean: default_checks
+	rm -f $(configBuildPath)/iso_root/boot/{vmlinuz,initrd.img}
+	rm -f $(configBuildPath)/iso_root/live/*
+	rm -f $(configBuildPath)/$(ISO_OUTPUT_NAME)
 
 
 # cleans everything
-distclean: checkroot
-	@sudo rm -rf $(configBuildPath)
+distclean: default_checks
+	sudo rm -rf $(configBuildPath)
 
 
 # migrate
-migrate: checkroot
+migrate: default_checks
 	@for file in $(migrate_files); do \
 		echo "Applying: $$file..."; \
 		cp "$$file" $(chrootPath)/tmp/migrate.sh || exit 1; \
@@ -64,44 +64,44 @@ migrate: checkroot
 	done
 
 # installs definied packages.
-install_pkgs: checkroot
-	@chroot $(chrootPath) apt install $(APT_ARG) $(CHROOT_PKGS) -y
+install_pkgs: default_checks
+	chroot $(chrootPath) apt install $(APT_ARG) $(CHROOT_PKGS) -y
 
-createisoskel: checkroot
-	@mkdir -p $(configBuildPath)/iso_root/live
-	@mkdir -p $(configBuildPath)/iso_root/boot/grub
+createisoskel: default_checks
+	mkdir -p $(configBuildPath)/iso_root/live
+	mkdir -p $(configBuildPath)/iso_root/boot/grub
 
-	@cp $(workdir)/configs/$(CONFIG)/grub/grub.cfg $(configBuildPath)/iso_root/boot/grub/grub.cfg
+	cp $(workdir)/configs/$(CONFIG)/grub/grub.cfg $(configBuildPath)/iso_root/boot/grub/grub.cfg
 
-setup_rootfs: checkroot
+setup_rootfs: default_checks
 	@echo "Debian: '$(DEBIAN_VERSION)' being created from: '$(CONFIG)' config"
-	@debootstrap $(DEBOOTSTRAP_ARGS) --arch $(ARCH) $(DEBIAN_VERSION) $(chrootPath) http://deb.debian.org/debian/
+	debootstrap $(DEBOOTSTRAP_ARGS) --arch $(ARCH) $(DEBIAN_VERSION) $(chrootPath) http://deb.debian.org/debian/
 
-setup: checkroot createisoskel setup_rootfs install_pkgs migrate
-	@echo "done: setup"
+setup: default_checks createisoskel setup_rootfs install_pkgs migrate
+	@echo "Setup is done, used config: '$(CONFIG)'"
 
 # initramfs generating
-genInitramfs: checkroot 
-	@chroot $(chrootPath) update-initramfs -u
+genInitramfs: default_checks 
+	chroot $(chrootPath) update-initramfs -u
 
 # squashfs generating
-genSquashfs: checkroot
-	@rm -f $(configBuildPath)/iso_root/live/filesystem.squashfs || true
-	@mksquashfs $(chrootPath) $(configBuildPath)/iso_root/live/filesystem.squashfs -comp xz
+genSquashfs: default_checks
+	rm -f $(configBuildPath)/iso_root/live/filesystem.squashfs || true
+	mksquashfs $(chrootPath) $(configBuildPath)/iso_root/live/filesystem.squashfs -comp xz
 
 # boot file copy
-copyBoots: checkroot
-	@cp $(chrootPath)/vmlinuz $(configBuildPath)/iso_root/boot
-	@cp $(chrootPath)/initrd.img $(configBuildPath)/iso_root/boot
+copyBoots: default_checks
+	cp $(chrootPath)/vmlinuz $(configBuildPath)/iso_root/boot
+	cp $(chrootPath)/initrd.img $(configBuildPath)/iso_root/boot
 
 # iso regenerating
-reiso: checkroot
-	@$(GRUB_MKRESCUE) $(configBuildPath)/iso_root -o $(configBuildPath)/$(ISO_OUTPUT_NAME)
+reiso: default_checks
+	$(GRUB_MKRESCUE) $(configBuildPath)/iso_root -o $(configBuildPath)/$(ISO_OUTPUT_NAME)
 	@echo "Your iso is regerated: $(configBuildPath)/$(ISO_OUTPUT_NAME)"
 	@echo "Your iso is stored here: $(configBuildPath)"
 
 # original iso generating 
-iso: checkroot genInitramfs genSquashfs copyBoots
-	@$(GRUB_MKRESCUE) $(configBuildPath)/iso_root -o $(configBuildPath)/$(ISO_OUTPUT_NAME)
+iso: default_checks genInitramfs genSquashfs copyBoots
+	$(GRUB_MKRESCUE) $(configBuildPath)/iso_root -o $(configBuildPath)/$(ISO_OUTPUT_NAME)
 	@echo "Your iso is done: $(configBuildPath)/$(ISO_OUTPUT_NAME)"
 	@echo "Your iso is stored here: $(configBuildPath)"

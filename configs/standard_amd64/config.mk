@@ -12,11 +12,9 @@ CHROOT_PKGS := live-boot \
 	xorg \
 	sudo
 
-# settings
-# required
+
 DEBIAN_VERSION := stable
 ARCH := amd64
 
-# not required
 #APT_ARG := --no-install-recommends
 #DEBOOTSTRAP_ARGS := --variant minbase	
