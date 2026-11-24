@@ -3,25 +3,22 @@ if [[ "$EUID" -ne 0 ]]; then
     exit 1;
 fi;
 
-dnf_pkgs="squashfs-tools qemu-system-x86_64 debootstrap grub2 gcc gcc-c++ make"
-apt_pkgs="squashfs-tools xorriso qemu-system debootstrap grub2 grub-common grub-pc make"
-
+dnf_pkgs="squashfs-tools xorriso debootstrap grub2 make"
+apt_pkgs="squashfs-tools xorriso debootstrap grub-pc make"
 
 os=$(. /etc/os-release && echo "$ID")
-
-echo "Host dependency installer begins: "
-echo "Host system: $os"
+echo "Building on: $os"
 
 case "$os" in
     fedora|centos)
-        dnf update -qq
-        dnf install $dnf_pkgs -y -qq
+        dnf update
+        dnf install $dnf_pkgs
         ;;
     ubuntu|debian)
-        apt update -qq
-        apt install $apt_pkgs -y -qq
+        apt update
+        apt install $apt_pkgs
         ;;
     *)
-        echo "idk os bro"
+        echo "Unknown operating system: $os"
         ;;
 esac

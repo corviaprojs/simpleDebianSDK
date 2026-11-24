@@ -1,8 +1,9 @@
-# HEAVLY UNDER DEVELOPMENT AND TESTING
-
 # simpleLinuxSDK
 
-A linux rootfs 'maker' thats enables you to create Debian based custom bootable operating system.
-Its customizable in the **Makefile** you just...
+# HEAVLY UNDER DEVELOPMENT AND TESTING
 
-# TODO: write document about v2
+# TODO: write more document about v2
+
+some context:
+- 'configs' folder: the where each configuration settings.
+- 'sources' folder: download paths for rootfs's

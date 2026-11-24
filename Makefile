@@ -9,7 +9,7 @@ chrootPath      := $(workdir)/build/$(CONFIG)/rootfs
 configBuildPath := $(workdir)/build/$(CONFIG)
 
 GRUB_MKRESCUE := $(shell command -v grub2-mkrescue 2>/dev/null || echo grub-mkrescue)	
-migrate_files := $(wildcard $(workdir)/configs/$(CONFIG)/migrate/*)
+migrate_files := $(wildcard $(configBuildPath)/migrate/*)
 SHELL := /bin/bash
 
 all:
@@ -63,25 +63,23 @@ migrate: checkroot
 		rm $(chrootPath)/tmp/migrate.sh; \
 	done
 
+# installs packages.
 install_pkgs: checkroot
 	@chroot $(chrootPath) apt install $(APT_ARG) $(CHROOT_PKGS) -y
 
-# Setup --- begin
 createisoskel: checkroot
 	@mkdir -p $(configBuildPath)/iso_root/live
 	@mkdir -p $(configBuildPath)/iso_root/boot/grub
 
 	@cp $(workdir)/configs/$(CONFIG)/grub/grub.cfg $(configBuildPath)/iso_root/boot/grub/grub.cfg
 
+# TODO: (finish) rebind to source system
 setup_rootfs: checkroot
 	@echo "Debian: '$(DEBIAN_VERSION)' being created from: '$(CONFIG)' config"
 	@debootstrap $(DEBOOTSTRAP_ARGS) --arch $(ARCH) $(DEBIAN_VERSION) $(chrootPath) http://deb.debian.org/debian/
 
 setup: checkroot createisoskel setup_rootfs install_pkgs migrate
 	@echo "done: setup"
-
-
-# Setup --- end
 
 # initramfs generating
 genInitramfs: checkroot 
