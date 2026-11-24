@@ -1,3 +1,4 @@
+set -e
 # setting the hostname
 echo "simplelinuxsdk" > /etc/hostname
 

@@ -97,10 +97,22 @@ Check your configuration is right with:
 sudo make CONFIG=[config_name] default_checks 
 ```
 
-### Install Packages: 
+### Install Packages
 Re-runs the package installation step for the selected configuration.
 ```sh
 sudo make CONFIG=[config_name] install_pkgs
+```
+
+### Cleaning
+Clean commands: `distclean` and `isoclean`<br>
+
+Fully deletes the config generated build enironment. <br>
+```sh
+sudo make CONFIG=[config_name] distclean
+```
+Clears the generated iso files.
+```sh
+sudo make CONFIG=[config_name] isoclean
 ```
 
 ## Schematic

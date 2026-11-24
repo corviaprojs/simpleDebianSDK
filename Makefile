@@ -8,8 +8,10 @@ workdir         := $(shell pwd)
 chrootPath      := $(workdir)/build/$(CONFIG)/rootfs
 configBuildPath := $(workdir)/build/$(CONFIG)
 
+configMigratePath := $(configBuildPath)/migrate
+
 GRUB_MKRESCUE := $(shell command -v grub2-mkrescue 2>/dev/null || echo grub-mkrescue)	
-migrate_files := $(wildcard $(configBuildPath)/migrate/*)
+migrate_files := $(wildcard $(workdir)/configs/$(CONFIG)/migrate/*)
 SHELL := /bin/bash
 
 all:
@@ -53,6 +55,7 @@ distclean: default_checks
 
 
 # migrate
+
 migrate: default_checks
 	@for file in $(migrate_files); do \
 		echo "Applying: $$file..."; \
@@ -61,6 +64,7 @@ migrate: default_checks
 		chroot $(chrootPath) /tmp/migrate.sh || exit 1; \
 		rm $(chrootPath)/tmp/migrate.sh; \
 	done
+	@echo "Migrate is done."
 
 # installs definied packages.
 install_pkgs: default_checks

@@ -3,7 +3,13 @@ ISO_OUTPUT_NAME := minimal_amd64.iso
 
 # the packages that gets installed
 CHROOT_PKGS := live-boot \
-	linux-image-6.12.107+deb13-amd64 
+	linux-image-6.12.107+deb13-amd64 \
+	openrc \
+	sysvinit-core \
+	isc-dhcp-client \
+	ifupdown \
+	openbox \
+	lightdm
 
 DEBIAN_VERSION := stable
 ARCH := amd64
