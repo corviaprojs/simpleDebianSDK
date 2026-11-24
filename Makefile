@@ -13,8 +13,7 @@ migrate_files := $(wildcard $(configBuildPath)/migrate/*)
 SHELL := /bin/bash
 
 all:
-	@echo "Check the README.md! To get started!"
-
+	@echo "Check the README.md, to get started!"
 
 # check you are running as root/sudo
 default_checks:
