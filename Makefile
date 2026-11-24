@@ -63,7 +63,7 @@ migrate: checkroot
 		rm $(chrootPath)/tmp/migrate.sh; \
 	done
 
-# installs packages.
+# installs definied packages.
 install_pkgs: checkroot
 	@chroot $(chrootPath) apt install $(APT_ARG) $(CHROOT_PKGS) -y
 
@@ -73,7 +73,6 @@ createisoskel: checkroot
 
 	@cp $(workdir)/configs/$(CONFIG)/grub/grub.cfg $(configBuildPath)/iso_root/boot/grub/grub.cfg
 
-# TODO: (finish) rebind to source system
 setup_rootfs: checkroot
 	@echo "Debian: '$(DEBIAN_VERSION)' being created from: '$(CONFIG)' config"
 	@debootstrap $(DEBOOTSTRAP_ARGS) --arch $(ARCH) $(DEBIAN_VERSION) $(chrootPath) http://deb.debian.org/debian/
