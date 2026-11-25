@@ -94,11 +94,12 @@ genSquashfs: default_checks
 
 # boot file copy
 copyBoots: default_checks
+	cp $(workdir)/configs/$(CONFIG)/grub/grub.cfg $(configBuildPath)/iso_root/boot/grub/grub.cfg
 	cp $(chrootPath)/vmlinuz $(configBuildPath)/iso_root/boot
 	cp $(chrootPath)/initrd.img $(configBuildPath)/iso_root/boot
 
 # iso regenerating
-reiso: default_checks
+reiso: default_checks copyBoots
 	$(GRUB_MKRESCUE) $(configBuildPath)/iso_root -o $(configBuildPath)/$(ISO_OUTPUT_NAME)
 	@echo "Your iso is regerated: $(configBuildPath)/$(ISO_OUTPUT_NAME)"
 	@echo "Your iso is stored here: $(configBuildPath)"
