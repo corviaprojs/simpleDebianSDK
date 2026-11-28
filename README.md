@@ -30,9 +30,9 @@ A config is created from 3 things:<br>
 Shell scripts is gonna directly run inside the environment.<br>
 Its copys the shell script directly and runs it in chroot, then removes it.
 
-### grub folder
+### iso_root folder
 <hr>
-The grub2 folder, where the grub.cfg is stored.
+The folder content is gonna get copied, directory, files all. 
 
 ## Custom Config
 #### 1. Create folder in configs with a name like: 'minimal_example'

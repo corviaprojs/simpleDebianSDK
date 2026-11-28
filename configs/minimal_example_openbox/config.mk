@@ -1,5 +1,5 @@
 # the iso final name
-ISO_OUTPUT_NAME := minimal_example.iso
+ISO_OUTPUT_NAME := minimal_example_openbox.iso
 
 # the packages that gets installed
 CHROOT_PKGS := live-boot \
